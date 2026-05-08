@@ -458,6 +458,58 @@ class CobrancaSMS extends Model
                 //oci_execute($curs);
         */      return $curs;      
     }
+
+    public function agendamento_no_show($i){
+
+		$model = new ConexaoSantaCasa();
+        $this->bd  = $model->ConnectionBD();
+		$stmt = oci_parse($this->bd, "SELECT a.cd_agenda_central, a.cd_it_agenda_central cd_it_marcacao,
+                                        a.cd_paciente cd_paciente,
+                                        a.nm_paciente nm_paciente,
+                                        a.nr_ddd_fone,
+                                        a.nr_fone,
+                                        a.nr_ddd_celular||
+                                        regexp_replace(a.nr_celular , '[^[:digit:]]', null ) nr_telefone ,
+                                        a.cd_ser_dis cd_ser_dis,
+                                        d.ds_ser_dis ds_ser_dis,
+                                        a.hr_agenda,
+                                        a.hr_agenda dt_marcacao,
+                                        a.hr_agenda dt_agendado,
+                                        to_char(a.hr_agenda,'HH24') || 'h'|| to_char(a.hr_agenda,'MI') horario,
+                                        b.cd_prestador,
+                                        E.nm_prestador,
+                                        c.ds_unidade_atendimento ds_undidade
+                                    FROM   dbamv.it_agenda_central a,
+                                        dbamv.agenda_central b,
+                                        dbamv.unidade_atendimento c,
+                                        dbamv.ser_dis d,
+                                        dbamv.prestador E
+                                    WHERE  a.cd_agenda_central = b.cd_agenda_central
+                                        AND d.cd_ser_dis = a.cd_ser_dis
+                                        AND E.cd_prestador = B.cd_prestador
+                                        AND b.cd_unidade_atendimento = c.cd_unidade_atendimento
+                                        --AND a.hr_agenda >= sysdate + 0.40
+                                        ----  AND a.cd_usuario <> 'INTEGRADOR.AGENDA'   ---  a partir de 15/03/2021 esta mandando whats para todos agendamentos APP +  WEB  + CENTRAL
+                                        AND a.cd_it_agenda_pai IS NULL
+                                        --AND a.sn_atendido <> 'S'
+                                        AND (A.TP_SITUACAO IS NULL  OR  A.TP_SITUACAO <> 'C') ---- NAO PEGA horario em vermelho  cancelado
+                                        AND a.cd_item_agendamento <> 1001 --- NAO PEGA AGENDA CLINICA DOLZANI.
+                                        AND B.cd_prestador <> 3229 --- NAO PEGA TRANSPLANTE CLINICA CENTRO
+                                        AND A.cd_ser_dis <> 130 ---   NAO PEGA NUTRI TRANSPLANTE
+                                        AND to_date(a.hr_agenda,'DD/MM/YYYY')= to_date(sysdate-:i,'DD/MM/YYYY')
+                                        AND A.SN_BLOQUEADO <> 'S'   --- Não pega agenda bloqueada
+                                        AND a.nr_celular is not null
+                                        AND a.cd_paciente not in (45445)
+                                        and a.cd_atendimento is null");
+		oci_bind_by_name($stmt, ":i", $i);
+		oci_execute($stmt);
+
+        $result = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            $result[] = $row;
+        }
+        return $result;
+    }
 	
 	public function agendamentosPendentes()
     {

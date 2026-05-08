@@ -89,14 +89,21 @@ class TangranController extends Controller
         return response()->json($agendamentoPendentes);
     }
 	
-	 public function lista_agendamento_v2(){  
-	
-        $this->cobrancasms->agendamento_proc1_ExecProc();
-        $this->cobrancasms->agendamento_proc2_ExecProc_v2();
-        $agendamentoPendentes =  $this->cobrancasms
-                                 ->agendamentosPendentes_v2();
-         return response()->json($agendamentoPendentes);
-     }
+    public function lista_agendamento_v2(){  
+
+    $this->cobrancasms->agendamento_proc1_ExecProc();
+    $this->cobrancasms->agendamento_proc2_ExecProc_v2();
+    $agendamentoPendentes =  $this->cobrancasms
+                                ->agendamentosPendentes_v2();
+        return response()->json($agendamentoPendentes);
+    }
+
+    public function lista_agendamento_no_show($dias){
+
+       $agendamentoNoshow =  $this->cobrancasms
+                                ->agendamento_no_show($dias);
+        return response()->json($agendamentoNoshow);
+    }
 	
 	public function aprovacaoAntibioticoIAMSPE(){        
        $this->cobrancasms->aprovacaoAntibioticoIAMSPEExecProc();

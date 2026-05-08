@@ -34,6 +34,9 @@ $this->group(['prefix'=>'v1'], function(){
 	Route::get('tangran/lista_agendamento_v2', array('middleware' => 'cors',
 	'uses' => 'Api\v1\TangranController@lista_agendamento_v2'));
 
+	Route::get('tangran/lista_agendamento_no_show/{dias}', array('middleware' => 'cors',
+	'uses' => 'Api\v1\TangranController@lista_agendamento_no_show'));
+
 	Route::get('tangran/panico_alterar/cod_log/{cod_log}/cod_status_envio/{cod_status_envio}', array('middleware' => 'cors',
 	 'uses' => 'Api\v1\TangranController@alterarPendentePanico'));
 
