@@ -506,11 +506,13 @@ class CobrancaSMS extends Model
 
         $result = [];
         while ($row = oci_fetch_assoc($stmt)) {
-            $result[] = $row;
+            $result[] = array_map(function($value) {
+                return is_string($value) ? mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1') : $value;
+            }, $row);
         }
         return $result;
     }
-	
+
 	public function agendamentosPendentes()
     {
         return   DB::connection('oracle')->table(DB::raw('dbamv.log_agendamento_consultas t  ')) 
